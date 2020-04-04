@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
   int token;
+  int tokenn;
   // Receive from the lower process and send to the higher process. Take care
   // of the special case when you are the first process to prevent deadlock.
   if (world_rank != 0) {
@@ -27,12 +28,23 @@ int main(int argc, char** argv) {
              MPI_STATUS_IGNORE);
     printf("Process %d received token %d from process %d\n", world_rank, token,
            world_rank - 1);
+    MPI_Recv(&tokenn, 2, MPI_INT, world_rank +1, 0, MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
+    printf("Process %d received token %d from process %d\n", world_rank, tokenn,
+           world_rank + 1);    
+    
   } else {
     // Set the token's value if you are process 0
     token = -1;
+    tokenn = 1;
   }
-  MPI_Send(&token, 1, MPI_INT, (world_rank + 1) % world_size, 0,
+  MPI_Send(&token, 1, MPI_INT, (world_rank + 1) % world_size, 0, MPI_COMM_WORLD);
+  if (world_rank!=0){
+    MPI_Send(&tokenn, 2, MPI_INT, world_rank - 1, 0,
            MPI_COMM_WORLD);
+  } else {
+     MPI_Send(&tokenn, 2, MPI_INT, world_size, 0, MPI_COMM_WORLD); 
+  }  
   // Now process 0 can receive from the last process. This makes sure that at
   // least one MPI_Send is initialized before all MPI_Recvs (again, to prevent
   // deadlock)
@@ -41,6 +53,10 @@ int main(int argc, char** argv) {
              MPI_STATUS_IGNORE);
     printf("Process %d received token %d from process %d\n", world_rank, token,
            world_size - 1);
+    MPI_Recv(&tokenn, 2, MPI_INT, 1, 0, MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
+    printf("Process %d received token %d from process %d\n", world_rank, tokenn,
+           world_size - 1);    
   }
   MPI_Finalize();
 }

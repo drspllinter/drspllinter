@@ -19,23 +19,23 @@ int main(int argc, char** argv) {
   int world_size;
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-  int tokenn=1;
+  char tokenn="R";
   if (world_rank==0) {
-    MPI_Send(&tokenn, 2, MPI_INT, world_size - 1, 0, MPI_COMM_WORLD); 
+    MPI_Send(&tokenn, 2, MPI_BYTE, world_size - 1, 0, MPI_COMM_WORLD); 
   }
   if (world_rank != world_size-1) {
-    MPI_Recv(&tokenn, 2, MPI_INT, world_rank + 1, 0, MPI_COMM_WORLD,
+    MPI_Recv(&tokenn, 2, MPI_BYTE, world_rank + 1, 0, MPI_COMM_WORLD,
              MPI_STATUS_IGNORE);
     printf("Process %d received token %d from process %d\n", world_rank, tokenn,
            world_rank + 1);    
   } else{
-    MPI_Recv(&tokenn, 2, MPI_INT, 0, 0, MPI_COMM_WORLD,
+    MPI_Recv(&tokenn, 2, MPI_BYTE, 0, 0, MPI_COMM_WORLD,
              MPI_STATUS_IGNORE);
     printf("Process %d received token %d from process %d\n", world_rank, tokenn,
            0);     
   }
   if (world_rank !=0){
-    MPI_Send(&tokenn, 2, MPI_INT, world_rank - 1, 0, MPI_COMM_WORLD);
+    MPI_Send(&tokenn, 2, MPI_BYTE, world_rank - 1, 0, MPI_COMM_WORLD);
   }  
 
   MPI_Finalize();

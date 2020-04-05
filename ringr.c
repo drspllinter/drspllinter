@@ -19,8 +19,9 @@ int main(int argc, char** argv) {
   int world_size;
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-  char tokenn='R';
+  
   if (world_rank==0) {
+    char tokenn='R';
     MPI_Send(&tokenn, 2, MPI_BYTE, world_size - 1, 0, MPI_COMM_WORLD); 
   }
   if (world_rank != world_size-1) {
